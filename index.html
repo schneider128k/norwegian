@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OrðaTól · Norwegian Vocabulary</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --blue:#003087;--red:#c8102e;--bg:#f7f6f3;--card:#fff;
+  --text:#111827;--muted:#6b7280;--border:#e5e7eb;
+  --amber:#fef3c7;--amber-t:#92400e;--amber-b:#f59e0b;
+  --shadow:0 2px 20px rgba(0,0,0,.09),0 1px 4px rgba(0,0,0,.06);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;display:flex;flex-direction:column;overflow-x:hidden}
+/* ── SPLASH ── */
+#splash{position:fixed;inset:0;z-index:9999;background:#000;display:flex;align-items:center;justify-content:center;transition:opacity .7s ease}
+#splash.fade-out{opacity:0;pointer-events:none}
+#splash img{width:100%;height:100%;object-fit:cover;object-position:center top}
+#splash-skip{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.45);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;border:1px solid rgba(255,255,255,.2);padding:6px 18px;border-radius:20px;backdrop-filter:blur(4px)}
+#splash-skip:active{color:#fff}
+.hdr{background:var(--blue);color:#fff;padding:14px 20px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.logo{font-size:1.35rem;font-weight:800;letter-spacing:-.5px}
+.logo span{color:#ff7070}
+.hdr-sub{margin-left:auto;font-size:.75rem;opacity:.7;text-align:right;line-height:1.4}
+.unit-scroll{background:#fff;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;flex-shrink:0}
+.unit-scroll::-webkit-scrollbar{display:none}
+.unit-tabs{display:flex;padding:10px 14px;gap:7px;width:max-content}
+.utab{padding:7px 15px;border-radius:18px;border:2px solid var(--border);background:#fff;font-size:.83rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--muted);transition:all .15s;min-height:34px;display:flex;align-items:center}
+.utab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.mode-bar{background:#fff;border-bottom:1px solid var(--border);padding:9px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0}
+.mode-toggle{display:flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px}
+.mbtn{padding:6px 14px;border:none;border-radius:7px;font-size:.83rem;font-weight:600;cursor:pointer;background:transparent;color:var(--muted);transition:all .15s}
+.mbtn.active{background:#fff;color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.sess-info{margin-left:auto;font-size:.75rem;color:var(--muted)}
+.etym-toggle{padding:6px 12px;border-radius:20px;border:2px solid var(--amber-b);background:var(--amber);color:var(--amber-t);font-size:.78rem;font-weight:700;cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0}
+.etym-toggle.off{background:#fff;border-color:var(--border);color:var(--muted)}
+main{flex:1;padding:14px 14px 28px;display:flex;flex-direction:column;align-items:center;gap:12px;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.prog-row{width:100%;max-width:560px;display:flex;justify-content:space-between;font-size:.75rem;color:var(--muted)}
+.prog-track{width:100%;max-width:560px;height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:var(--blue);border-radius:3px;transition:width .4s ease}
+.stats-row{width:100%;max-width:560px;display:flex;gap:12px;justify-content:center;font-size:.75rem}
+.sc{display:flex;align-items:center;gap:5px;color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.dn{background:#93c5fd}.dl{background:#fca5a5}.dk{background:#86efac}
+/* CARD */
+.card-wrap{width:100%;max-width:560px}
+.card{background:#fff;border-radius:22px;box-shadow:var(--shadow);min-height:340px;padding:22px 22px 18px;cursor:pointer;display:flex;flex-direction:column;position:relative;transition:transform .12s;user-select:none;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--blue),var(--red))}
+.card:active{transform:scale(.986)}
+.card-meta{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px}
+.c-unit{font-size:.7rem;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:.06em}
+.type-badge{font-size:.67rem;color:var(--muted);background:var(--bg);padding:3px 9px;border-radius:11px;font-weight:500;text-transform:uppercase;letter-spacing:.04em}
+/* FRONT */
+.c-front{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.nor-big{font-size:2.8rem;font-weight:800;line-height:1.1;color:var(--text);letter-spacing:-.5px}
+.ipa-front{font-size:.95rem;color:var(--muted);margin-top:6px;letter-spacing:.02em;font-family:'SF Mono','Courier New',monospace}
+.tap-hint{margin-top:20px;font-size:.82rem;color:#d1d5db;display:flex;align-items:center;gap:5px}
+/* BACK */
+.c-back{flex:1;display:flex;flex-direction:column;gap:11px}
+.back-top{display:flex;flex-direction:column;align-items:center;gap:3px}
+.nor-sm{font-size:1.5rem;font-weight:800;color:var(--text);text-align:center}
+.ipa-back{font-size:.85rem;color:var(--muted);font-family:'SF Mono','Courier New',monospace;text-align:center}
+.divider{width:30px;height:2px;background:var(--border);margin:6px auto}
+.eng{font-size:1.4rem;font-weight:700;color:var(--blue);text-align:center;line-height:1.3}
+.example{font-size:.88rem;color:var(--muted);font-style:italic;text-align:center;line-height:1.6;padding:0 2px}
+.etym-box{background:var(--amber);border-left:3px solid var(--amber-b);border-radius:0 9px 9px 0;padding:9px 13px;font-size:.79rem;color:var(--amber-t);line-height:1.55}
+.etym-lbl{font-weight:700;text-transform:uppercase;font-size:.66rem;letter-spacing:.05em;margin-bottom:3px;opacity:.7}
+.back-actions{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap}
+.speak-btn{display:flex;align-items:center;gap:7px;padding:9px 20px;border-radius:20px;border:2px solid var(--blue);background:transparent;color:var(--blue);font-size:.87rem;font-weight:700;cursor:pointer;transition:all .15s}
+.speak-btn:active,.speak-btn.on{background:var(--blue);color:#fff}
+/* RATING */
+.rating-area{width:100%;max-width:560px}
+.r-grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:7px}
+.rbtn{padding:12px 5px;border:none;border-radius:12px;font-size:.78rem;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:transform .12s;line-height:1.2}
+.rbtn:active{transform:scale(.92)}
+.rbtn .ic{font-size:1.1rem}.rbtn .lb{font-size:.74rem}.rbtn .sb{font-size:.62rem;opacity:.7;font-weight:500}
+.r0{background:#fee2e2;color:#b91c1c}.r1{background:#fef3c7;color:#b45309}
+.r2{background:#dcfce7;color:#15803d}.r3{background:#dbeafe;color:#1d4ed8}
+/* LEARN NEXT */
+.learn-next{width:100%;max-width:560px}
+.nxt-btn{width:100%;padding:15px;background:var(--blue);color:#fff;border:none;border-radius:15px;font-size:1rem;font-weight:700;cursor:pointer;transition:transform .12s}
+.nxt-btn:active{transform:scale(.97)}
+/* DONE */
+.done-card{width:100%;max-width:560px;background:#fff;border-radius:22px;box-shadow:var(--shadow);padding:30px 24px;text-align:center}
+.done-card h2{font-size:1.85rem;font-weight:800;margin-top:8px}
+.done-card p{color:var(--muted);margin-top:8px;font-size:.92rem;line-height:1.5}
+.done-btns{display:flex;gap:8px;margin-top:18px;flex-wrap:wrap}
+.bp{flex:1;min-width:110px;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer}
+.bp:active{opacity:.85}
+.bs{flex:1;min-width:110px;padding:12px;background:var(--bg);color:var(--text);border:none;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer}
+.bs:active{opacity:.85}
+.bprint{flex:1;min-width:110px;padding:12px;background:#fef3c7;color:#92400e;border:2px solid #f59e0b;border-radius:12px;font-size:.9rem;font-weight:700;cursor:pointer}
+.bprint:active{opacity:.85}
+.done-note{font-size:.72rem;color:var(--muted);margin-top:12px;line-height:1.5}
+/* LIST VIEW */
+.list-screen{width:100%;max-width:560px}
+.li-item{background:#fff;border-radius:10px;padding:12px 14px;margin-bottom:6px;display:flex;align-items:center;gap:9px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.li-no{font-weight:800;font-size:.97rem;flex:1;min-width:0}
+.li-ipa{font-size:.72rem;color:var(--muted);font-family:'SF Mono','Courier New',monospace;flex:1;min-width:0}
+.li-en{color:var(--muted);font-size:.83rem;flex:2;min-width:0}
+.li-ty{font-size:.62rem;color:var(--muted);background:var(--bg);border-radius:7px;padding:2px 6px;white-space:nowrap;flex-shrink:0}
+.li-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+/* IPA LEGEND */
+.ipa-legend{width:100%;max-width:560px;background:#fff;border-radius:14px;padding:14px 16px;box-shadow:0 1px 6px rgba(0,0,0,.06)}
+.ipa-legend h4{font-size:.8rem;font-weight:700;color:var(--blue);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em}
+.ipa-legend table{width:100%;border-collapse:collapse;font-size:.76rem}
+.ipa-legend td{padding:3px 6px;border-bottom:1px solid var(--border)}
+.ipa-legend td:first-child{font-family:'SF Mono','Courier New',monospace;font-weight:700;color:var(--text);width:60px}
+.ipa-legend td:nth-child(2){color:var(--muted)}
+.hidden{display:none!important}
+@keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeUp .2s ease}
+@media(min-width:600px){.nor-big{font-size:3.2rem}.card{min-height:370px;padding:26px}}
+@media(max-height:680px){.card{min-height:260px}.nor-big{font-size:2.2rem}}
+
+/* ── PRINT STYLES ──────────────────────────────────────────────────────────── */
+@media print{
+  body{background:#fff!important;font-family:Georgia,serif}
+  .hdr,.unit-scroll,.mode-bar,.no-print{display:none!important}
+  main{padding:0!important;gap:0!important}
+  .print-sheet{display:block!important;width:100%;padding:20px}
+  .print-sheet h1{font-size:1.4rem;font-weight:700;margin-bottom:4px}
+  .print-sheet .sub{font-size:.85rem;color:#555;margin-bottom:16px}
+  .print-sheet table{width:100%;border-collapse:collapse;font-size:.88rem}
+  .print-sheet th{background:#003087;color:#fff;padding:6px 8px;text-align:left;font-size:.78rem}
+  .print-sheet td{padding:6px 8px;border-bottom:1px solid #ddd;vertical-align:top}
+  .print-sheet tr:nth-child(even) td{background:#f5f5f5}
+  .print-sheet .ipa-cell{font-family:'Courier New',monospace;font-size:.78rem;color:#444}
+  .print-sheet .etym-cell{font-size:.75rem;color:#666}
+  *:not(.print-sheet):not(.print-sheet *){display:none!important}
+}
+.print-sheet{display:none}
+</style>
+</head>
+<body>
+
+<!-- SPLASH -->
+<div id="splash">
+  <img src="splash.jpg" alt="OrðaTól">
+  <div id="splash-skip" onclick="dismissSplash()">tap to begin</div>
+</div>
+
+<header class="hdr">
+  <div class="logo">Orða<span>Tól</span></div>
+  <div class="hdr-sub" id="hdrSub">Norwegian on the Web · Chapter 1</div>
+</header>
+
+<div class="unit-scroll"><div class="unit-tabs" id="unitTabs"></div></div>
+
+<div class="mode-bar">
+  <div class="mode-toggle">
+    <button class="mbtn active" id="btnLearn"    onclick="setMode('learn')">📖 Learn</button>
+    <button class="mbtn"        id="btnPractice" onclick="setMode('practice')">🎯 Practice</button>
+    <button class="mbtn"        id="btnList"     onclick="setMode('list')">📋 List</button>
+  </div>
+  <button class="etym-toggle" id="etymToggle" onclick="toggleEtym()">🔗 Origins on</button>
+  <div class="sess-info" id="sessInfo"></div>
+</div>
+
+<main id="mainEl">
+  <!-- Progress -->
+  <div class="prog-row hidden" id="progRow">
+    <span id="progLabel"></span><span id="progPct"></span>
+  </div>
+  <div class="prog-track hidden" id="progTrack">
+    <div class="prog-fill" id="progFill" style="width:0%"></div>
+  </div>
+  <div class="stats-row hidden" id="statsRow">
+    <div class="sc"><div class="dot dn"></div><span id="cntNew">0 new</span></div>
+    <div class="sc"><div class="dot dl"></div><span id="cntLrn">0 learning</span></div>
+    <div class="sc"><div class="dot dk"></div><span id="cntKnw">0 known</span></div>
+  </div>
+
+  <!-- FLASHCARD -->
+  <div class="card-wrap hidden" id="cardWrap">
+    <div class="card fade-in" id="flashcard" onclick="handleTap()">
+      <div class="card-meta">
+        <div class="c-unit" id="cardUnit"></div>
+        <div class="type-badge" id="cardType"></div>
+      </div>
+      <!-- Front -->
+      <div class="c-front" id="cFront">
+        <div class="nor-big" id="norWord"></div>
+        <div class="ipa-front" id="ipaFront"></div>
+        <div class="tap-hint">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          tap to reveal
+        </div>
+      </div>
+      <!-- Back -->
+      <div class="c-back hidden" id="cBack">
+        <div class="back-top">
+          <div class="nor-sm" id="norWordB"></div>
+          <div class="ipa-back" id="ipaBack"></div>
+          <div class="divider"></div>
+          <div class="eng" id="engWord"></div>
+        </div>
+        <div class="example" id="exWord"></div>
+        <div class="etym-box" id="etymBox">
+          <div class="etym-lbl">🔗 English &amp; German connection</div>
+          <div id="etymText"></div>
+        </div>
+        <div class="back-actions">
+          <button class="speak-btn" id="speakBtn" onclick="event.stopPropagation();doSpeak()">🔊 Hør uttalen</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rating (practice) -->
+  <div class="rating-area hidden" id="ratingArea">
+    <div class="r-grid">
+      <button class="rbtn r0" onclick="rate(0)"><span class="ic">🔄</span><span class="lb">Again</span><span class="sb">show again</span></button>
+      <button class="rbtn r1" onclick="rate(1)"><span class="ic">😓</span><span class="lb">Hard</span><span class="sb">struggled</span></button>
+      <button class="rbtn r2" onclick="rate(2)"><span class="ic">✓</span><span class="lb">Good</span><span class="sb">got it!</span></button>
+      <button class="rbtn r3" onclick="rate(3)"><span class="ic">⭐</span><span class="lb">Easy</span><span class="sb">knew it</span></button>
+    </div>
+  </div>
+
+  <!-- Next (learn) -->
+  <div class="learn-next hidden" id="learnNext">
+    <button class="nxt-btn" onclick="nextCard()">Neste ord →</button>
+  </div>
+
+  <!-- List view -->
+  <div class="list-screen hidden" id="listScreen"></div>
+
+  <!-- Session done -->
+  <div class="done-card hidden" id="doneCard">
+    <div style="font-size:2.6rem">🎉</div>
+    <h2>Bra jobba!</h2>
+    <p id="doneMsg"></p>
+    <div class="done-btns">
+      <button class="bp" onclick="restart()">Study again</button>
+      <button class="bprint hidden" id="printBtn" onclick="printMissed()">🖨 Print missed</button>
+      <button class="bs" onclick="resetProgress()">Reset progress</button>
+    </div>
+    <div class="done-note">
+      Keyboard shortcuts: <b>Space</b> = flip/next · <b>1/2/3/4</b> = rate · <b>S</b> = speak<br>
+      Progress saves in your browser. Clearing cache resets it — that's fine!
+    </div>
+  </div>
+
+  <!-- IPA legend (shown in list mode) -->
+  <div class="ipa-legend hidden" id="ipaLegend">
+    <h4>IPA pronunciation guide</h4>
+    <table>
+      <tr><td>¹</td><td>Tone 1 — simple, falling tone (single pitch peak)</td></tr>
+      <tr><td>²</td><td>Tone 2 — musical, falling-rising tone (the "Norwegian melody")</td></tr>
+      <tr><td>ʉ</td><td>Like German "ü" / French "u" — rounded front vowel</td></tr>
+      <tr><td>æ</td><td>Like "e" in English "bed" (open front vowel)</td></tr>
+      <tr><td>ø</td><td>Like German "ö" / French "eu"</td></tr>
+      <tr><td>å</td><td>Like English "aw" in "law" (rounded back vowel)</td></tr>
+      <tr><td>ɖ ʈ</td><td>Retroflex consonants — tongue curled back (unique to Norwegian)</td></tr>
+      <tr><td>ʃ</td><td>Like "sh" in "shoe"</td></tr>
+      <tr><td>ŋ</td><td>Like "ng" in "sing"</td></tr>
+    </table>
+  </div>
+</main>
+
+<!-- Print sheet (hidden, used only for printing) -->
+<div class="print-sheet" id="printSheet"></div>
+
+<script>
+// ─── IPA MAP from NTNU vocabulary tables ──────────────────────────────────────
+const IPA = {
+  'antropologi':'/ɑntrupulu¹giː/','arkitektur':'/ɑrkitek¹tʉːr/','avis':'/ɑ¹viːs/',
+  'bare':'/²bɑːre/','bensinstasjon':'/ben¹siːnstɑˌʃuːn/','bil':'/¹biːl/',
+  'bli':'/¹bliː/','bo':'/¹buː/','bra':'/¹brɑː/','brus':'/¹brʉːs/',
+  'by':'/¹byː/','båt':'/¹boːt/','dag':'/¹dɑːg/','dame':'/²dɑːme/',
+  'de':'/¹diː/','deg':'/¹dæi/','den':'/¹den/','der':'/¹dæːr/',
+  'dere':'/²deːre/','det':'/¹deː/','du':'/¹dʉː/','ei':'/¹æi/',
+  'ekspeditør':'/ekspedi¹tøːr/','en':'/¹eːn/','engelsk':'/¹eŋelsk/',
+  'er':'/¹æːr/','et':'/¹et/','familie':'/fɑ¹miːlie/','flink':'/¹fliŋk/',
+  'fly':'/¹flyː/','fra':'/¹frɑː/','gammel':'/²gɑmel/','gift':'/¹jift/',
+  'gjøre':'/²jøːre/','god':'/¹guː/','ha':'/¹hɑː/','hallo':'/hɑ¹luː/',
+  'han':'/¹hɑn/','her':'/¹hæːr/','hete':'/²heːte/','hilse':'/²hilse/',
+  'hun':'/¹hʉn/','hva':'/¹vɑː/','hvor':'/¹vur/','hvordan':'/¹vuɖɑn/',
+  'hyggelig':'/²hygeli/','i':'/¹iː/','ikke':'/²ike/','Italia':'/i¹tɑːliɑ/',
+  'italiensk':'/itɑli¹eːnsk/','ja':'/¹jɑː/','jeg':'/¹jæi/','jente':'/²jente/',
+  'jobbe':'/²jobe/','kanskje':'/²kɑnʃe/','kart':'/¹kɑʈ/',
+  'kilometer':'/¹çiloˌmeːter/','komme':'/²kome/','koste':'/²koste/',
+  'krone':'/²kruːne/','langt':'/¹lɑŋt/','ledig':'/²leːdi/','litt':'/¹lit/',
+  'med':'/¹meː/','men':'/¹men/','morgen':'/²moːoɳ/','møte':'/²møːte/',
+  'nei':'/¹næi/','neste':'/²neste/','Norge':'/¹norgə/','norsk':'/¹noʃk/',
+  'nå':'/¹noː/','og':'/oː/','også':'/²oso/','over':'/¹oːver/',
+  'professor':'/pru¹fesur/','på':'/¹poː/','reise':'/²ræise/','Roma':'/¹ruːmɑ/',
+  'sammen':'/¹sɑmen/','seinere':'/¹sæinere/','seks':'/¹seks/','ses':'/¹seːs/',
+  'snakke':'/²snɑke/','snart':'/¹snɑːʈ/','Spania':'/¹spɑːniɑ/','spansk':'/¹spɑnsk/',
+  'stoppe':'/²stope/','student':'/stʉ¹dent/','studere':'/stʉ¹deːre/',
+  'ta':'/¹tɑː/','takk':'/¹tɑk/','til':'/¹til/','tilbake':'/til¹bɑːke/',
+  'tog':'/¹toːg/','Trondheim':'/²tronˌhæim/','tur':'/¹tʉːr/','turist':'/tʉ¹rist/',
+  'tusen':'/¹tʉːsn̩/','tysk':'/¹tysk/','Tyskland':'/¹tysklɑn/',
+  'unnskyld':'/²ʉnˌʃyl/','velkommen':'/vel¹komen/','vi':'/viː/','være':'/²væːre/',
+  'år':'/¹oːr/',
+  // numbers
+  'null':'/¹nʉl/','to':'/¹tuː/','tre':'/¹treː/','fire':'/²fiːre/','fem':'/¹fem/',
+  'ni':'/¹niː/','ti':'/¹tiː/','elleve':'/¹elve/','tolv':'/¹tɔlv/',
+  'tjue':'/¹çʉːe/','tretti':'/²treti/','førti':'/²førti/','hundre':'/²hʉnre/',
+  'åtte':'/²ɔte/','sju':'/¹ʃʉː/','syv':'/¹syːv/',
+};
+
+function getIpa(word){ return IPA[word.replace(/\s*\/.*$/,'').trim()]||''; }
+
+// ─── VOCABULARY ───────────────────────────────────────────────────────────────
+const V={
+ k:[
+  {no:'bo',en:'to live, reside',type:'verb',etym:'German "bauen" (to build/dwell) — same Old Germanic root *bū-. Old English "būan" → archaic "boor" (farmer). Norwegian preserves the purest form.',ex:'Jeg bor i Trondheim.'},
+  {no:'dame',en:'lady, woman',type:'noun (f)',etym:'French "dame" → English "dame", German "Dame" — all Latin "domina". A shared French loanword.',ex:'Det er en dame der.'},
+  {no:'du',en:'you (singular)',type:'pronoun',etym:'German "du" = English archaic "thou" — same Proto-Germanic *þū. Norwegian uses "du" for everyone; English lost "thou" in everyday speech.',ex:'Hva heter du?'},
+  {no:'ei',en:'a / an (feminine article)',type:'article',etym:'German "eine" — English "one/a/an" — same root *ainō. Norwegian keeps 3 genders (en/ei/et); German has 3; English collapsed to "a/an".',ex:'Jeg har ei jente.'},
+  {no:'er',en:'am / are / is',type:'verb',etym:'English "are" — the SAME Old Norse word "er"! Norwegian "er" and English "are" are identical. German uses "bin/bist/ist". Remarkable survival.',ex:'Jeg er student.'},
+  {no:'familie',en:'family',type:'noun (m)',etym:'Latin "familia" — identical in English "family", German "Familie". A universal European loanword.',ex:'Har du familie i Trondheim?'},
+  {no:'fra',en:'from',type:'prep.',etym:'Old Norse "frá" → English "from" — same word! German uses "von". Norwegian "fra" and English "from" are direct cognates.',ex:'Jeg kommer fra England.'},
+  {no:'gammel',en:'old',type:'adj.',etym:'Old Norse "gamall" — same root as English "yore" (days of yore). German says "alt". "Gamle dager" = the old days.',ex:'Hvor gammel er du?'},
+  {no:'gift',en:'married (also: poison!)',type:'adj.',etym:'⚠️ German "Gift" = POISON. Norwegian "gift" = married OR poison. Both from Germanic "give" — wedding gift (dowry) and a poison gift. English "gift" = present. Same root, 3 meanings!',ex:'Ja, jeg er gift.'},
+  {no:'ha',en:'to have',type:'verb',etym:'English "have" — German "haben" — same Proto-Germanic *habjaną. Almost unchanged for 1000 years.',ex:'Har du familie?'},
+  {no:'han',en:'he',type:'pronoun',etym:'Old Norse "hann" — same root as English "he", German "er". "han/hun" are direct Old Norse descendants.',ex:'Han heter Ken.'},
+  {no:'hete',en:'to be called / named',type:'verb',etym:'German "heißen" (to be called) — exact same meaning! "Wie heißt du?" (DE) = "Hva heter du?" (NO). Old English "hātan" → archaic past "hight" (was called).',ex:'Jeg heter Monika.'},
+  {no:'hun',en:'she',type:'pronoun',etym:'Old Norse "hon" — same root as English "she" (evolved via Viking settlements). German "sie".',ex:'Hun heter Emma.'},
+  {no:'hva',en:'what',type:'question word',etym:'English "what" — German "was" — same *hwat. The "hv-" = English "wh-" = German "w-". Classic Germanic question-word family.',ex:'Hva heter du?'},
+  {no:'hvor',en:'where',type:'question word',etym:'English "where" — German "wo" — same *hwō. Pattern: hva/what, hvor/where, hvordan/how, hvem/who. "hv/wh/w" across all three.',ex:'Hvor kommer du fra?'},
+  {no:'i',en:'in, at, on (location)',type:'prep.',etym:'English "in" — German "in" — virtually unchanged from Proto-Germanic *in. One of the oldest words.',ex:'Jeg bor i Trondheim.'},
+  {no:'ja',en:'yes',type:'interj.',etym:'German "ja" = English "yea/yeah" — same root. "ja" in Norwegian and German is the same ancient word.',ex:'Ja, jeg er gift.'},
+  {no:'jeg',en:'I',type:'pronoun',etym:'German "ich" — English "I" — same *ek root. Gothic "ik", Old Norse "ek/eg" → Norwegian "jeg". The "-g" reflects the older form.',ex:'Jeg heter Ken.'},
+  {no:'jente',en:'girl',type:'noun (f)',etym:'Old Norse "genta". Specifically North Germanic — German says "Mädchen".',ex:'Jeg har ei jente.'},
+  {no:'komme',en:'to come',type:'verb',etym:'English "come" — German "kommen" — same *kwemaną. One of the most recognizable Germanic cognates.',ex:'Jeg kommer fra England.'},
+  {no:'med',en:'with',type:'prep.',etym:'English "mid-" (in "midwife" = one WITH the wife during birth). German "mit". Old English "mid" = with.',ex:'Kom med meg!'},
+  {no:'men',en:'but',type:'conj.',etym:'Old Norse "men" — a conjunction. German "aber". English "but". The three languages diverged here.',ex:'Jeg er fra Oslo, men jeg bor i Trondheim.'},
+  {no:'Norge',en:'Norway',type:'proper noun',etym:'Old Norse "Norðvegr" = "North Way" — the coastal sea route northward. English "Norway" from the same Old Norse root.',ex:'Jeg kommer fra Norge.'},
+  {no:'og',en:'and',type:'conj.',etym:'English "and" — German "und" — same *andi. "og" looks different but IS the same word. Shows how Germanic languages diverged in form.',ex:'Jeg heter Ken og jeg er fra England.'},
+  {no:'reise',en:'to travel, journey',type:'verb',etym:'German "reisen" (to travel) — exact cognate! "Eine Reise" = a trip. English "raise" shares the same Norse root (to rise up and go).',ex:'Vi reiser til Trondheim.'},
+  {no:'seks',en:'six',type:'numeral',etym:'English "six" — German "sechs" — Latin "sex" — same Proto-IE *swéḱs. This number word is 6000+ years old.',ex:'Emma er seks år.'},
+  {no:'snakke',en:'to speak, talk',type:'verb',etym:'German dialect "schnacken" (to chat) — same root. "Snakke" is the everyday Norwegian word for talking.',ex:'Snakker du norsk?'},
+  {no:'til',en:'to, until',type:'prep.',etym:'English "till/until" — same Old Norse "til". English "till noon" uses exactly the Norwegian word. "Till" in English IS Norwegian "til".',ex:'Vi reiser til Trondheim.'},
+  {no:'tog',en:'train',type:'noun (n)',etym:'German "Zug" (train) — same root *tugaz (that which is pulled). English "tow" and "tug" share it. Trains are pulled — the word reveals the technology.',ex:'Jeg tar toget.'},
+  {no:'Trondheim',en:'Trondheim (city in Norway)',type:'proper noun',etym:'"-heim" = home — German "Heim", English "home". Same suffix in: Mannheim, Blenheim. Old Norse "þróndarheimr" = home of the Trønder people.',ex:'Jeg bor i Trondheim.'},
+  {no:'være',en:'to be',type:'verb',etym:'English "were" (past of "be") — same *wesaną. "Vær så god!" = "Be so good!" Norwegian "være" = English archaic "were".',ex:'Det er godt å være her.'},
+  {no:'år',en:'year',type:'noun (n)',etym:'German "Jahr" — English "year" — Old Norse "ár" — same *jēraną. "år/Jahr/year" — the same ancient word.',ex:'Emma er seks år.'},
+ ],
+ a:[
+  {no:'antropologi',en:'anthropology',type:'noun (m)',etym:'Greek "anthropos" (human) + "logos" (study) — identical in English, German "Anthropologie". International academic vocabulary.',ex:'Jeg er professor i antropologi.'},
+  {no:'arkitektur',en:'architecture',type:'noun (m)',etym:'Greek/Latin "architectura" — same in English, German "Architektur". International loanword.',ex:'Jeg studerer arkitektur.'},
+  {no:'engelsk',en:'English (language/adj.)',type:'adj.',etym:'From "Engel-" = the Angles, a Germanic tribe from Angeln, Denmark who invaded Britain. English people are "Angles"! Same "-sk/-sch/-ish" suffix.',ex:'Jeg snakker engelsk.'},
+  {no:'flink',en:'good at, clever, skilful',type:'adj.',etym:'German "flink" = quick, nimble — same word! Slightly different meaning: German = fast, Norwegian = skilled. Old Norse "flinkr".',ex:'Du er veldig flink!'},
+  {no:'fly',en:'airplane',type:'noun (n)',etym:'English "fly" — German "fliegen/Flieger" — same *fleuganą. Norwegian used the verb root as the noun for the aircraft.',ex:'Jeg reiser med fly.'},
+  {no:'gjøre',en:'to do',type:'verb',etym:'English "do" — German "tun" — same *dōną. "Hva gjør du?" = "Was machst du?" = "What do you do?"',ex:'Hva gjør du i Norge?'},
+  {no:'ikke',en:'not',type:'adverb',etym:'German "nicht" — English "not" — same: *ne (not) + *wiht (thing) = "not a thing". "Ikke/nicht/not" — same etymology.',ex:'Jeg er ikke norsk.'},
+  {no:'Italia',en:'Italy',type:'proper noun',etym:'Latin "Italia" — English "Italy", German "Italien". Norwegian uses the Latin/Italian form.',ex:'Jeg kommer fra Italia.'},
+  {no:'italiensk',en:'Italian (language/adj.)',type:'adj.',etym:'"-sk" (NO) = "-ish" (EN) = "-isch" (DE) — the SAME Germanic suffix. "norsk/Norwegian/Norwegisch" — identical pattern.',ex:'Jeg snakker italiensk.'},
+  {no:'jobbe',en:'to work',type:'verb',etym:'Norwegian borrowed English "job" and made a verb "jobbe"! Interesting reversal. German says "arbeiten". English gave this word to Norwegian.',ex:'Jeg jobber på NTNU.'},
+  {no:'litt',en:'a little, a bit',type:'adverb',etym:'English "little" — same *lūtilaz (bending low = small). Norwegian "litt" = shortened "little". German "ein bisschen" is different.',ex:'Jeg snakker litt norsk.'},
+  {no:'norsk',en:'Norwegian (language/adj.)',type:'adj.',etym:'English "Norse" = the SAME word! "Old Norse" = Old Norwegian. You are learning the direct descendant of Viking-age Old Norse.',ex:'Snakker du norsk?'},
+  {no:'også',en:'also, too',type:'adverb',etym:'"og" (and) + "så" (so) = "and so" = also. English "also" = "all" + "so". Both Norwegian and English build "also" from basic words.',ex:'Jeg snakker også engelsk.'},
+  {no:'professor',en:'professor',type:'noun (m)',etym:'Latin "professor" — identical in English, German "Professor". Medieval university vocabulary.',ex:'Jeg er professor i antropologi.'},
+  {no:'på',en:'on, at (location)',type:'prep.',etym:'German "auf" (on/at) — same root! "På NTNU" = at NTNU. Norwegian "på" and German "auf" are cognates.',ex:'Jeg studerer på NTNU.'},
+  {no:'Roma',en:'Rome',type:'proper noun',etym:'Latin/Italian "Roma" — English "Rome", German "Rom". Norwegian uses the Latin/Italian form.',ex:'Jeg kommer fra Roma.'},
+  {no:'spansk',en:'Spanish (language/adj.)',type:'adj.',etym:'Latin "Hispania" → "spansk/Spanish/Spanisch". The "-sk/-sh/-isch" Germanic suffix is the same in all three.',ex:'Snakker du spansk?'},
+  {no:'student',en:'student',type:'noun (m)',etym:'Latin "studens" — identical in English, German "Student". Spread with the medieval university system.',ex:'Jeg er student.'},
+  {no:'studere',en:'to study',type:'verb',etym:'Latin "studēre" — English "study", German "studieren". "-ere" in Norwegian = "-ieren" in German = "-y" in English for Latin verbs.',ex:'Jeg studerer norsk.'},
+ ],
+ m:[
+  {no:'bare',en:'just, only, merely',type:'adverb',etym:'Old Norse "bara" — English "bare/barely" share the root. "Barely enough" = just enough. German "nur" is different.',ex:'Ja, bare litt.'},
+  {no:'bra',en:'fine, good, well',type:'adj./adv.',etym:'German "brav" (well-behaved, good) — same root! Italian "bravo" is family. English "brave" came from the same source (originally "fine/good").',ex:'Det går bra!'},
+  {no:'by',en:'city, town',type:'noun (m)',etym:'🏙️ Survives in English PLACE NAMES: Derby (deer-town), Rugby, Whitby, Grimsby. Old Norse "by" = settlement. Norwegian still uses it as the everyday word for city!',ex:'Trondheim er en stor by.'},
+  {no:'båt',en:'boat',type:'noun (m)',etym:'English "boat" — German "Boot" — same *baitaz. Nearly identical across all three: "båt/Boot/boat". One of the clearest Germanic cognates.',ex:'Vi reiser med båt.'},
+  {no:'dag',en:'day',type:'noun (m)',etym:'German "Tag" — English "day" — same *dagaz. "God dag!" = "Guten Tag!" = "Good day!" Same greeting, same words.',ex:'God dag!'},
+  {no:'deg',en:'you (object form)',type:'pronoun',etym:'German "dich" — English archaic "thee". "Takk til deg" = "Thank thee/you". Object form of "du".',ex:'Hyggelig å hilse på deg!'},
+  {no:'den',en:'it / that (m/f nouns)',type:'pronoun',etym:'German "die/den" — English "the/that" — same *þaz. Norwegian "den/det" parallel to German "die/das".',ex:'Den er god.'},
+  {no:'det',en:'it / that (neuter)',type:'pronoun',etym:'German "das" — English "that" — same *þat. "Det er..." = "Das ist..." = "That is..." — visibly the same.',ex:'Er det ledig her?'},
+  {no:'god',en:'good',type:'adj.',etym:'English "good" — German "gut" — same *gōdaz. Norwegian "god" sits BETWEEN "good" and "gut"! Three languages, one 4000-year-old root.',ex:'God morgen!'},
+  {no:'hallo',en:'hello',type:'interj.',etym:'German "hallo" — English "hello" — the same 19th-century word. Became universal partly through the telephone.',ex:'Hallo! Snakker du norsk?'},
+  {no:'her',en:'here',type:'adverb',etym:'English "here" — German "hier" — same *hēr. "her/here/hier" — nearly identical in all three.',ex:'Er det ledig her?'},
+  {no:'hilse',en:'to greet',type:'verb',etym:'Old Norse "heilsa" = to say "heil!" (be well!). English "hail!" and "health" come from the same *hailaz root. "Hei!" is a shortened form.',ex:'Hyggelig å hilse på deg!'},
+  {no:'hvordan',en:'how',type:'question word',etym:'"hvor" + "dan" = how. "Hvordan går det?" = "Wie geht es?" = "How goes it?" Norwegian and German use "go"; English uses "be".',ex:'Hvordan går det?'},
+  {no:'hyggelig',en:'nice, pleasant, cozy',type:'adj.',etym:'"Hygge" is internationally famous — the Scandinavian concept of coziness. Old Norse "hyggja". English recently borrowed "hygge". German "gemütlich" = closest equivalent.',ex:'Hyggelig å møte deg!'},
+  {no:'kanskje',en:'perhaps, maybe',type:'adverb',etym:'"kan" (can) + "skje" (happen) = "can happen" = maybe. English "maybe" = "may be". Both built from modal verbs.',ex:'Kanskje vi ses igjen?'},
+  {no:'ledig',en:'vacant, free, available',type:'adj.',etym:'⚠️ German "ledig" = UNMARRIED/SINGLE! Both from *liðu- (free from obligations). Norwegian broadened to "free/available"; German stayed narrow. Asking a German "Er du ledig?" = asking if they\'re single!',ex:'Er det ledig her?'},
+  {no:'morgen',en:'morning',type:'noun (m)',etym:'English "morning/morn" — German "Morgen" — same *murganaz. "God morgen!" = "Guten Morgen!" = "Good morning!" — the same words!',ex:'God morgen!'},
+  {no:'møte',en:'to meet',type:'verb',etym:'English "meet" — Old English "mētan" — Old Norse "møta" — SAME word. Norwegian and English share this; German "treffen" is different.',ex:'Hyggelig å møte deg!'},
+  {no:'nei',en:'no',type:'interj.',etym:'German "nein" — English "nay" — same *ne + *ain (not one). "nei/nein/nay" — visibly the same. English "nay" IS Norwegian "nei".',ex:'Nei, jeg er ikke fra Norge.'},
+  {no:'neste',en:'next',type:'adj.',etym:'English "next" — German "nächste" — same *nēhwist-. "neste/next/nächste" — same ancestor.',ex:'Neste stasjon er Ålesund.'},
+  {no:'nå',en:'now',type:'adverb',etym:'English "now" — Old Norse "nú" → "nå". Same ancient word. Norwegian "nå" and English "now" both descended from Old Norse "nú".',ex:'Hvor er vi nå?'},
+  {no:'ses',en:'to see each other / "see you!"',type:'verb',etym:'English "see" — German "sehen" — same *sehwaną. "-s" marks reciprocal action. "Vi ses!" = "See you!" = "We see-each-other!"',ex:'Vi ses seinere!'},
+  {no:'snart',en:'soon',type:'adverb',etym:'Old Norse "snarr" = quick, swift. English "smart" shares this root! (Originally: quick/sharp → clever). Norwegian "snart" and English "smart" are cognates with shifted meaning.',ex:'Vi kommer snart til Ålesund.'},
+  {no:'Spania',en:'Spain',type:'proper noun',etym:'Latin "Hispania" → Norwegian "Spania". German "Spanien". All from the Roman province name.',ex:'Jeg kommer fra Spania.'},
+  {no:'takk',en:'thank you, thanks',type:'interj.',etym:'English "thank" — German "Dank" — same *þankaz. "takk/Dank/thanks" — the same! "Mange takk" = "Vielen Dank" = "Many thanks".',ex:'Takk! Mange takk!'},
+  {no:'turist',en:'tourist',type:'noun (m)',etym:'French "touriste" → English "tourist", German "Tourist", Norwegian "turist". From French "tour" = round trip. Modern international word.',ex:'Jeg er turist i Norge.'},
+  {no:'unnskyld',en:'excuse me, sorry',type:'interj.',etym:'"un-" (without) + "skyld" (guilt) = "without guilt". German "Entschuldigung" = SAME structure: "ent-" + "Schuld". Norwegian and German independently built the identical compound!',ex:'Unnskyld, snakker du norsk?'},
+  {no:'vi',en:'we',type:'pronoun',etym:'English "we" — German "wir" — same root. "vi/we/wir" — Norwegian and English are closer ("vi/we") than German ("wir").',ex:'Vi kommer fra Spania.'},
+  {no:'vær så god',en:"please / here you go / you're welcome",type:'phrase',etym:'"vær" (be!) + "så" (so) + "god" (good) = "be so good" = please. German "bitte" (from "bitten" = to beg). Norwegian is most transparent.',ex:'Vær så god, sitt ned!'},
+ ],
+ p:[
+  {no:'avis',en:'newspaper',type:'noun (f)',etym:'French "avis" (notice/opinion). English "advice" from the same French root! German "Zeitung". "Avis" = information in French and Norwegian.',ex:'Jeg tar ei avis.'},
+  {no:'bensinstasjon',en:'petrol / gas station',type:'noun (m)',etym:'"bensin" (benzine) + "stasjon" (station). "Bensin" = English "benzene", German "Benzin". "Stasjon" = English/German "station". Transparent compound.',ex:'Vi stopper på bensinstasjonen.'},
+  {no:'bil',en:'car, automobile',type:'noun (m)',etym:'Short for "automobil" — English "automobile", German "Auto". The Scandinavian abbreviation "bil" was coined around 1900.',ex:'Vi reiser med bil.'},
+  {no:'bli',en:'to become / to stay / will be',type:'verb',etym:'German "bleiben" (to stay/remain) — same root! English "bide" (archaic). "bli" and "bleiben" are cognates meaning "remain/become".',ex:'Hva vil du bli?'},
+  {no:'brus',en:'soda, fizzy drink',type:'noun (m)',etym:'German "Brause" = soda water — SAME root! Both from a "rushing/fizzing" sound. Norwegian "brus" and German "Brause" share the fizzy-drink meaning.',ex:'Jeg tar en brus.'},
+  {no:'de',en:'they',type:'pronoun',etym:'English "they" was BORROWED from Old Norse "þeir" by Vikings! So Norwegian "de" and English "they" are cognates — English took this pronoun from Old Norse.',ex:'De er studenter.'},
+  {no:'der',en:'there',type:'adverb',etym:'English "there" — same root. "der/there" — nearly identical form and meaning. "Der borte" = "over there".',ex:'Der borte er bensinstasjonen.'},
+  {no:'dere',en:'you (plural)',type:'pronoun',etym:'Norwegian preserved singular vs plural "you". Old English "ye" was plural — Norwegian "dere" parallels old English "ye". English merged them into one "you".',ex:'Hvor kommer dere fra?'},
+  {no:'ekspeditør',en:'shop assistant, clerk',type:'noun (m)',etym:'From Latin "expedire" (to dispatch) via French. English "expedite" = same root. The "-ør" = French "-eur" suffix.',ex:'Ekspeditøren er hyggelig.'},
+  {no:'en',en:'a / an (common gender article)',type:'article',etym:'English "one/an/a" — German "ein/eine" — same *ainaz. The indefinite article in all Germanic languages is literally the number ONE.',ex:'Jeg ser en bil.'},
+  {no:'et',en:'a / an (neuter article)',type:'article',etym:'Norwegian neuter article. "en" (common gender) vs "et" (neuter) = simpler than German\'s three (der/die/das). Old Norse "eitt".',ex:'Det er et kart.'},
+  {no:'kart',en:'map',type:'noun (n)',etym:'English "chart" — German "Karte" — Latin "charta" (parchment). "kart/Karte/chart" = same Latin origin. A map was originally a piece of parchment.',ex:'Har du et kart?'},
+  {no:'kilometer',en:'kilometre',type:'noun (m)',etym:'Greek "khilioi" (thousand) + "metron" (measure) — same in English, German. Metric system vocabulary is fully international.',ex:'Det er 50 kilometer til Trondheim.'},
+  {no:'koste',en:'to cost',type:'verb',etym:'English "cost" — German "kosten" — same Latin/French origin. "koste/kosten/cost" — transparent across all three.',ex:'Hva koster det?'},
+  {no:'krone',en:'crown (Norwegian currency)',type:'noun (f)',etym:'English "crown" — German "Krone" — Latin "corona". All the same word. The currency is named after the royal crown. "Corona" in English = the same Latin word!',ex:'Det koster hundre kroner.'},
+  {no:'langt',en:'far, long (distance)',type:'adj./adv.',etym:'English "long" — German "lang" — same *langaz. "Hvor langt?" = "How far?" Long distance = far away.',ex:'Er det langt til Trondheim?'},
+  {no:'over',en:'over, above, across',type:'prep.',etym:'English "over" — German "über" — same *uƀeri. Norwegian "over" = English "over" IDENTICAL! German "über" shifted the vowel. Perhaps the most transparent Norwegian-English pair.',ex:'Broen går over elven.'},
+  {no:'sammen',en:'together',type:'adverb',etym:'German "zusammen" (= "zu" + "samman"). Same root as English "same". Norwegian "sammen" = German "zusammen" minus "zu-".',ex:'Vi reiser sammen.'},
+  {no:'stoppe',en:'to stop',type:'verb',etym:'English "stop" — German "stoppen" — same (Old English "stoppian" = to plug). "Stopp!" = "Stop!" in all three languages.',ex:'Vi stopper her.'},
+  {no:'ta',en:'to take',type:'verb',etym:'English "take" was BORROWED from Old Norse "taka"! Old English used "niman" → German "nehmen". Vikings gave English "take". Norwegian "ta" and English "take" share Old Norse "taka".',ex:'Jeg tar toget.'},
+  {no:'tilbake',en:'back, backwards',type:'adverb',etym:'"til" (to) + "bake" (back). English "back" and Norwegian "bake" are cognates. "Come tilbake" = "Come back" — same words rearranged.',ex:'Kom tilbake!'},
+  {no:'tur',en:'trip, walk, tour',type:'noun (m)',etym:'English "tour" — German "Tour" — French "tour" — Latin "tornare" (to turn = a round journey). Same word as English "tour".',ex:'Vi er på tur i Norge.'},
+  {no:'tusen',en:'thousand',type:'numeral',etym:'English "thousand" — German "tausend" — same *þūsundī. "tusen/tausend/thousand" — visibly the same.',ex:'Det koster tusen kroner.'},
+  {no:'tysk',en:'German (language/adj.)',type:'adj.',etym:'🤯 "Tysk" = "Deutsch" = "Dutch" — ALL the same word *þiudiskaz (= "of the people"). English "Dutch" = Netherlands; "Deutsch" = Germany; Norwegian "tysk" = German. One root, three meanings!',ex:'Snakker du tysk?'},
+  {no:'Tyskland',en:'Germany',type:'proper noun',etym:'"Tysk" + "-land" = Germany. German "Deutschland" = "Deutsch" + "-land". Same construction. "-land" = English "land", German "Land".',ex:'Peter kommer fra Tyskland.'},
+  {no:'velkommen',en:'welcome',type:'interj.',etym:'English "welcome" — German "willkommen" — same root. "vel/will" (well/wished) + "kommen" (come). "Welcome" = "a wished-for guest". Same word across all three.',ex:'Velkommen til Norge!'},
+ ],
+ numbers:[
+  {no:'null',en:'zero',type:'numeral',etym:'Latin "nullus" (none) → English "null", German "null". International word from medieval mathematics.',ex:'Null poeng.'},
+  {no:'én / ei / ett',en:'one',type:'numeral',etym:'English "one/an" — German "ein/eine/ein" — same *ainaz. Norwegian has 3 gender forms (én, ei, ett) like German. The number ONE became the article in all Germanic languages.',ex:'Én krone. Ei jente. Ett år.'},
+  {no:'to',en:'two',type:'numeral',etym:'English "two" (silent w) — German "zwei" — same *dwóh₁. Norwegian "to" and English "two" are almost identical in sound!',ex:'To studenter.'},
+  {no:'tre',en:'three',type:'numeral',etym:'English "three" — German "drei" — same root. Also means "tree" in Norwegian! German uses "Baum" for tree — no collision. "Tre" = three AND tree.',ex:'Tre dager.'},
+  {no:'fire',en:'four',type:'numeral',etym:'English "four" — German "vier" — same root (f/v shift is normal in Germanic). "Fire" also means "to fire/shoot" in Norwegian — same spelling!',ex:'Fire kilometer.'},
+  {no:'fem',en:'five',type:'numeral',etym:'English "five" — German "fünf" — same root. Norwegian "fem" and English "five" both start with "f". Proto-Germanic *fimf.',ex:'Fem minutter.'},
+  {no:'seks',en:'six',type:'numeral',etym:'English "six" — German "sechs" — Latin "sex" — same root. "Seksten" (16) = "seks-ten" = six-teen. Same structure.',ex:'Emma er seks år.'},
+  {no:'sju / syv',en:'seven',type:'numeral',etym:'English "seven" — German "sieben" — same *septm̥. Two forms: "sju" (modern) and "syv" (traditional). All the same ancient word.',ex:'Sju dager i uken.'},
+  {no:'åtte',en:'eight',type:'numeral',etym:'English "eight" — German "acht" — same *oḱtṓw. "åtte/acht/eight" — visibly the same! Same 6000-year-old root.',ex:'Åtte timer.'},
+  {no:'ni',en:'nine',type:'numeral',etym:'English "nine" — German "neun" — same root. Norwegian "ni" = shortest form. Proto-Germanic *newun.',ex:'Ni kroner.'},
+  {no:'ti',en:'ten',type:'numeral',etym:'English "ten" — German "zehn" — same root. Norwegian "ti" = simplest form. "Tjue" (20) = two-ten. Same decimal logic as English.',ex:'Ti minutter.'},
+  {no:'elleve',en:'eleven',type:'numeral',etym:'English "eleven" — German "elf" — same *ainalif = "ONE LEFT over ten". Eleven literally = "one remaining after ten". "elleve/eleven/elf" — same compound.',ex:'Elleve personer.'},
+  {no:'tolv',en:'twelve',type:'numeral',etym:'English "twelve" — German "zwölf" — same *twalif = "TWO LEFT over ten". "tolv/twelve/zwölf" — same compound.',ex:'Tolv måneder i et år.'},
+  {no:'tjue',en:'twenty',type:'numeral',etym:'Old Norse "tuttugu" → "tjue". English "twenty" = "two-tens". German "zwanzig" = same. "Tjueen" (21) = twenty-one.',ex:'Tjue år.'},
+  {no:'tretti',en:'thirty',type:'numeral',etym:'"tre" (three) + "-ti" (ten) = thirty. English "thirty" = "three-ten". Transparent in Norwegian: "tre-ti" = three-ten.',ex:'Tretti studenter.'},
+  {no:'førti',en:'forty',type:'numeral',etym:'"fire" (four) + "-ti" = forty. English "forty". German "vierzig". Same decimal structure.',ex:'Førti kilometer.'},
+  {no:'hundre',en:'hundred',type:'numeral',etym:'English "hundred" — German "hundert" — same *hundą. "hundre/hundert/hundred" — same 4000-year-old word.',ex:'Hundre kroner.'},
+  {no:'tusen',en:'thousand',type:'numeral',etym:'English "thousand" — German "tausend" — same *þūsundī. "Tusen takk!" = "A thousand thanks!"',ex:'Tusen takk!'},
+ ],
+ phrases:[
+  {no:'Hva heter du?',en:'What is your name?',type:'phrase',etym:'German: "Wie heißt du?" — same structure! "heter/heißt" = cognates. English uses "What IS your name?"; Norwegian/German use the verb "to be called".',ex:'Hva heter du? — Jeg heter Maria.'},
+  {no:'Jeg heter …',en:'My name is … / I am called …',type:'phrase',etym:'German: "Ich heiße …" — exact same structure. "heter/heiße" = cognates. English says "My name is"; Norwegian/German use the elegant verb "to be called".',ex:'Jeg heter Ken.'},
+  {no:'Hvor kommer du fra?',en:'Where do you come from?',type:'phrase',etym:'German: "Woher kommst du?" — same words. "Wo/Hvor", "kommst/kommer", "du/du". Almost identical syntax, no auxiliary "do" needed.',ex:'Jeg kommer fra England.'},
+  {no:'Hvordan går det?',en:'How are you? (lit: How goes it?)',type:'phrase',etym:'German: "Wie geht es?" — EXACT same! "Wie/Hvordan", "geht/går", "es/det". English "How ARE you?" uses "be"; Norwegian and German use "GO".',ex:'Hvordan går det? — Det går bra!'},
+  {no:'Det går bra!',en:"I'm fine! (lit: It goes well!)",type:'phrase',etym:'German: "Es geht mir gut!" — same. "Det/Es" (it), "går/geht" (goes), "bra/gut" (well). Norwegian and German say things "go" well.',ex:'Det går bra, takk!'},
+  {no:'Snakker du norsk?',en:'Do you speak Norwegian?',type:'phrase',etym:'Verb comes FIRST in yes/no questions — no auxiliary "do" needed. German: "Sprichst du Deutsch?" = same structure. Norwegian and German are more direct than English here.',ex:'Snakker du norsk? — Ja, litt.'},
+  {no:'Hyggelig å møte deg!',en:'Nice to meet you!',type:'phrase',etym:'"Hyggelig" (nice/cozy) + "å" (to) + "møte" (meet) + "deg" (you). "møte/meet" are cognates. "deg" = archaic English "thee".',ex:'Hyggelig å møte deg!'},
+  {no:'Ha det bra!',en:'Goodbye! (lit: Have it good!)',type:'phrase',etym:'"Ha" (have!) + "det" (it) + "bra" (good). A warm farewell wish — "have a good one!". German "Tschüss!" is different.',ex:'Ha det bra! Vi ses!'},
+  {no:'Unnskyld meg',en:'Excuse me',type:'phrase',etym:'"un-skyld-meg" = "remove guilt from me". German "Entschuldigen Sie mich" — IDENTICAL structure: "ent-Schuld-mich". Built from the same roots independently!',ex:'Unnskyld meg, er det ledig her?'},
+  {no:'Vær så god!',en:"Please / Here you go / You're welcome",type:'phrase',etym:'"Vær" (be!) + "så" (so) + "god" (good) = "Be so good as to…". German "Bitte!" (from "bitten" = to beg/ask). Norwegian is fully transparent.',ex:'Vær så god, sitt ned!'},
+ ],
+};
+
+const allWords = Object.entries(V).flatMap(([k,arr])=>arr.map(w=>({...w,_unit:k})));
+const ALL_UNITS = {all:allWords,...V};
+const UNIT_META = [
+  {key:'all',label:'✦ All'},
+  {key:'k',label:'1K · Ken'},
+  {key:'a',label:'1A · Anna'},
+  {key:'m',label:'1M · Maria'},
+  {key:'p',label:'1P · Peter'},
+  {key:'numbers',label:'📟 Numbers'},
+  {key:'phrases',label:'💬 Phrases'},
+];
+const UNIT_SUB = {all:'All units combined',k:'From Oslo by Train',a:'From Rome by Plane',
+  m:'From Bergen by Boat',p:'From Hamburg by Car',numbers:'Tall – 0 to 1000',phrases:'Useful phrases'};
+
+// ─── STATE ────────────────────────────────────────────────────────────────────
+let unit='k', mode='learn', deck=[], idx=0, shown=false, againQ=[];
+let missedWords=[];  // words rated "Again" this session
+let srs={};
+const SRS_KEY='norsk-srs-v2';
+function loadSRS(){try{return JSON.parse(localStorage.getItem(SRS_KEY))||{};}catch{return {};}}
+function saveSRS(){try{localStorage.setItem(SRS_KEY,JSON.stringify(srs));}catch{}}
+function cardId(w){return (w._unit||unit)+':'+w.no;}
+function cardState(w){
+  const d=srs[cardId(w)];
+  if(!d) return 'new';
+  if((d.interval||0)>=7) return 'known';
+  if((d.interval||0)>=1) return 'learning';
+  return 'new';
+}
+
+// ─── SPLASH ───────────────────────────────────────────────────────────────────
+(()=>{
+  const SPLASH_KEY='norsk-splash-last';
+  const HOUR=60*60*1000;
+  const last=parseInt(localStorage.getItem(SPLASH_KEY)||'0',10);
+  const splash=document.getElementById('splash');
+  if(Date.now()-last < HOUR){
+    splash.style.display='none';
+    return;
+  }
+  localStorage.setItem(SPLASH_KEY,Date.now());
+  let dismissed=false;
+  function dismissSplash(){
+    if(dismissed) return;
+    dismissed=true;
+    splash.classList.add('fade-out');
+    setTimeout(()=>splash.style.display='none', 700);
+  }
+  window.dismissSplash=dismissSplash;
+  setTimeout(dismissSplash, 3000);
+})();
+
+// ─── ETYMOLOGY TOGGLE ─────────────────────────────────────────────────────────
+let showEtym = localStorage.getItem('norsk-etym')!=='off';
+function toggleEtym(){
+  showEtym=!showEtym;
+  localStorage.setItem('norsk-etym',showEtym?'on':'off');
+  applyEtym();
+}
+function applyEtym(){
+  const btn=document.getElementById('etymToggle');
+  btn.textContent=showEtym?'🔗 Origins on':'🔗 Origins off';
+  btn.classList.toggle('off',!showEtym);
+  document.getElementById('etymBox').style.display=
+    (showEtym && deck[idx]?.etym) ? '' : 'none';
+}
+
+// ─── BOOT ─────────────────────────────────────────────────────────────────────
+srs=loadSRS();
+applyEtym();
+(()=>{
+  const el=document.getElementById('unitTabs');
+  el.innerHTML=UNIT_META.map(u=>`<button class="utab" onclick="setUnit('${u.key}')">${u.label}</button>`).join('');
+})();
+setUnit('k');
+
+function setUnit(u){
+  unit=u;
+  document.querySelectorAll('.utab').forEach((b,i)=>b.classList.toggle('active',UNIT_META[i].key===u));
+  document.getElementById('hdrSub').textContent=UNIT_SUB[u]||'';
+  buildDeck(); renderUI();
+}
+function setMode(m){
+  mode=m;
+  ['Learn','Practice','List'].forEach(k=>document.getElementById('btn'+k).classList.toggle('active',k.toLowerCase()===m));
+  buildDeck(); renderUI();
+}
+function buildDeck(){
+  const words=ALL_UNITS[unit]||[];
+  missedWords=[];
+  if(mode==='list'){deck=words;idx=0;return;}
+  if(mode==='learn'){deck=[...words];idx=0;shown=false;return;}
+  const now=Date.now();
+  const due=words.filter(w=>{const d=srs[cardId(w)];return d&&d.due<=now&&(d.interval||0)<21;});
+  const newW=words.filter(w=>!srs[cardId(w)]);
+  let d=[...due,...newW.slice(0,15)];
+  if(!d.length) d=[...words.filter(w=>(srs[cardId(w)]?.interval||0)<21),...newW].slice(0,20);
+  deck=d; idx=0; shown=false; againQ=[];
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+function show(id,v){document.getElementById(id).classList.toggle('hidden',!v);}
+function renderUI(){
+  const isList=mode==='list';
+  const hasCards=!isList&&deck.length>0;
+  show('listScreen',isList);show('ipaLegend',isList);
+  show('cardWrap',hasCards);show('progRow',hasCards);show('progTrack',hasCards);show('statsRow',hasCards);
+  show('doneCard',false);show('ratingArea',false);show('learnNext',false);
+  if(isList){renderList();return;}
+  if(hasCards){renderCard();}
+  else if(mode==='practice'){showDone();}
+  updateStats();
+}
+
+function renderCard(){
+  if(idx>=deck.length){showDone();return;}
+  const w=deck[idx];
+  const total=deck.length;
+  document.getElementById('progLabel').textContent=`Card ${idx+1} of ${total}`;
+  document.getElementById('progPct').textContent=Math.round(idx/total*100)+'%';
+  document.getElementById('progFill').style.width=(idx/total*100)+'%';
+  const uLabels={k:'1K · Ken',a:'1A · Anna',m:'1M · Maria',p:'1P · Peter',numbers:'Numbers',phrases:'Phrases'};
+  document.getElementById('cardUnit').textContent=uLabels[w._unit||unit]||'';
+  document.getElementById('cardType').textContent=w.type||'';
+  const wordKey=w.no.replace(/\s*\/.*$/,'').trim();
+  const ipa=getIpa(wordKey);
+  document.getElementById('norWord').textContent=w.no;
+  document.getElementById('ipaFront').textContent=ipa;
+  document.getElementById('norWordB').textContent=w.no;
+  document.getElementById('ipaBack').textContent=ipa;
+  document.getElementById('engWord').textContent=w.en;
+  document.getElementById('exWord').textContent=w.ex||'';
+  document.getElementById('etymText').textContent=w.etym||'';
+  document.getElementById('etymBox').style.display=(showEtym&&w.etym)?'':'none';
+  shown=false;
+  document.getElementById('cFront').classList.remove('hidden');
+  document.getElementById('cBack').classList.add('hidden');
+  show('ratingArea',false); show('learnNext',false);
+  const fc=document.getElementById('flashcard');
+  fc.classList.remove('fade-in'); void fc.offsetWidth; fc.classList.add('fade-in');
+  updateStats();
+}
+
+function handleTap(){
+  if(shown){if(mode==='learn')nextCard();return;}
+  shown=true;
+  document.getElementById('cFront').classList.add('hidden');
+  document.getElementById('cBack').classList.remove('hidden');
+  show('ratingArea',mode==='practice');
+  show('learnNext',mode==='learn');
+  setTimeout(()=>doSpeak(),250);
+}
+
+function nextCard(){idx++;shown=false;if(idx>=deck.length){showDone();return;}renderCard();}
+
+function rate(score){
+  const w=deck[idx];
+  const id=cardId(w);
+  const now=Date.now();
+  let d=srs[id]||{interval:0,ease:2.5,reps:0,state:'new'};
+  if(score===0){
+    againQ.push(w);
+    missedWords.push(w);
+    d.interval=0; d.state='new';
+  } else {
+    const base=Math.max(1,d.interval||1);
+    const ease=d.ease||2.5;
+    const ni=score===1?1:score===2?Math.max(1,Math.round(base*ease)):Math.max(3,Math.round(base*ease*1.3));
+    d.interval=ni; d.due=now+ni*86400000; d.reps=(d.reps||0)+1;
+    d.ease=Math.max(1.3,ease+(score===1?-0.15:score===3?0.15:0));
+    d.state=ni>=7?'known':(ni>=1?'learning':'new');
+  }
+  srs[id]=d; saveSRS();
+  idx++;
+  if(idx>=deck.length){
+    if(againQ.length>0){deck=[...againQ];againQ=[];idx=0;}
+    else{showDone();return;}
+  }
+  shown=false; renderCard();
+}
+
+function showDone(){
+  show('cardWrap',false);show('progRow',false);show('progTrack',false);
+  show('statsRow',false);show('ratingArea',false);show('learnNext',false);
+  show('doneCard',true);
+  const hasMissed=missedWords.length>0;
+  show('printBtn',hasMissed);
+  const words=ALL_UNITS[unit]||[];
+  const kn=words.filter(w=>cardState(w)==='known').length;
+  const lr=words.filter(w=>cardState(w)==='learning').length;
+  const nw=words.filter(w=>cardState(w)==='new').length;
+  let msg=`<b>${words.length}</b> words in this unit: `;
+  msg+=`<span style="color:#15803d"><b>${kn}</b> known</span> · `;
+  msg+=`<span style="color:#b45309"><b>${lr}</b> learning</span> · `;
+  msg+=`<span style="color:#1d4ed8"><b>${nw}</b> new</span>`;
+  if(hasMissed) msg+=`<br><span style="color:#b91c1c"><b>${missedWords.length}</b> word${missedWords.length>1?'s':''} to review</span>`;
+  document.getElementById('doneMsg').innerHTML=msg;
+}
+
+function restart(){
+  buildDeck();show('doneCard',false);
+  if(deck.length>0){show('cardWrap',true);show('progRow',true);show('progTrack',true);show('statsRow',true);renderCard();}
+}
+function resetProgress(){
+  (ALL_UNITS[unit]||[]).forEach(w=>delete srs[cardId(w)]);
+  saveSRS(); restart();
+}
+function updateStats(){
+  const words=ALL_UNITS[unit]||[];
+  document.getElementById('cntNew').textContent=words.filter(w=>cardState(w)==='new').length+' new';
+  document.getElementById('cntLrn').textContent=words.filter(w=>cardState(w)==='learning').length+' learning';
+  document.getElementById('cntKnw').textContent=words.filter(w=>cardState(w)==='known').length+' known';
+  document.getElementById('sessInfo').textContent=UNIT_SUB[unit]||'';
+}
+
+function renderList(){
+  const words=ALL_UNITS[unit]||[];
+  const stC={new:'#93c5fd',learning:'#fca5a5',known:'#86efac'};
+  const uL={k:'1K',a:'1A',m:'1M',p:'1P',numbers:'Nr',phrases:'Ph'};
+  document.getElementById('listScreen').innerHTML=words.map(w=>{
+    const st=cardState(w);
+    const ipa=getIpa(w.no.replace(/\s*\/.*$/,'').trim());
+    const ulab=unit==='all'?`<span style="font-size:.68rem;color:var(--blue);font-weight:700">${uL[w._unit]||''} · </span>`:'';
+    return `<div class="li-item"><div class="li-dot" style="background:${stC[st]}"></div>`+
+      `<div class="li-no">${ulab}${w.no}</div>`+
+      `<div class="li-ipa">${ipa}</div>`+
+      `<div class="li-en">${w.en}</div>`+
+      `<div class="li-ty">${w.type}</div></div>`;
+  }).join('');
+}
+
+// ─── PRINT MISSED WORDS ───────────────────────────────────────────────────────
+function printMissed(){
+  const date=new Date().toLocaleDateString('en-GB');
+  const uL={k:'1K · Ken',a:'1A · Anna',m:'1M · Maria',p:'1P · Peter',numbers:'Numbers',phrases:'Phrases',all:'All units'};
+  const unique=[...new Map(missedWords.map(w=>[w.no,w])).values()];
+  const rows=unique.map(w=>{
+    const ipa=getIpa(w.no.replace(/\s*\/.*$/,'').trim());
+    return `<tr><td>${w.no}</td><td class="ipa-cell">${ipa}</td><td>${w.en}</td><td>${w.type}</td><td class="etym-cell">${(w.etym||'').substring(0,80)}${(w.etym||'').length>80?'…':''}</td></tr>`;
+  }).join('');
+  document.getElementById('printSheet').innerHTML=`
+    <div class="print-sheet" style="display:block">
+      <h1>🇳🇴 Norwegian vocabulary to review</h1>
+      <div class="sub">Unit: ${uL[unit]} · Session date: ${date} · ${unique.length} word${unique.length!==1?'s':''}</div>
+      <table>
+        <thead><tr><th>Norwegian</th><th>IPA</th><th>English</th><th>Type</th><th>English/German connection</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+  window.print();
+}
+
+// ─── SPEECH ───────────────────────────────────────────────────────────────────
+let voices=[];
+function loadVoices(){voices=window.speechSynthesis.getVoices();}
+loadVoices();
+if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoices;
+
+function doSpeak(){
+  if(!window.speechSynthesis) return;
+  const w=deck[idx];
+  if(!w) return;
+  const text=w.no.replace(/\s*\/.*$/,'').replace(/…/g,'');
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  const norVoice=voices.find(v=>v.lang.startsWith('nb')||v.lang.startsWith('nn')||v.lang==='no');
+  if(norVoice){u.voice=norVoice;u.lang=norVoice.lang;}else{u.lang='nb-NO';}
+  u.rate=0.8; u.pitch=1;
+  const btn=document.getElementById('speakBtn');
+  btn.classList.add('on');
+  u.onend=()=>btn.classList.remove('on');
+  speechSynthesis.speak(u);
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(['Space','Enter'].includes(e.code)){e.preventDefault();if(!shown)handleTap();else if(mode==='learn')nextCard();}
+  if(e.key==='1'&&shown&&mode==='practice')rate(0);
+  if(e.key==='2'&&shown&&mode==='practice')rate(1);
+  if(e.key==='3'&&shown&&mode==='practice')rate(2);
+  if(e.key==='4'&&shown&&mode==='practice')rate(3);
+  if(e.key.toLowerCase()==='s')doSpeak();
+});
+</script>
+</body>
+</html>
