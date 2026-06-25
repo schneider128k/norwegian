@@ -683,20 +683,13 @@ function renderList(){
       `<div class="li-ipa">${ipa}</div>`+
       `<div class="li-en">${w.en}</div>`+
       `<div class="li-ty">${w.type}</div>`+
-      `<button class="li-speak" onclick="speakWord('${w.no.replace(/'/g,"\\'")}')" title="Hør uttalen">🔊</button>`+
+      `<button class="li-speak" onclick="speakWord('${w.no.replace(/'/g,"\\'")}',this)" title="Hør uttalen">🔊</button>`+
       `</div>`;
   }).join('');
 }
 
-function speakWord(text){
-  if(!window.speechSynthesis) return;
-  text=text.replace(/\s*\/.*$/,'');
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
-  const norVoice=voices.find(v=>v.lang.startsWith('nb')||v.lang.startsWith('nn')||v.lang==='no');
-  if(norVoice){u.voice=norVoice;u.lang=norVoice.lang;}else{u.lang='nb-NO';}
-  u.rate=0.8; u.pitch=1;
-  speechSynthesis.speak(u);
+function speakWord(text, btn){
+  playAudio(text, btn);
 }
 
 // ─── PRINT MISSED WORDS ───────────────────────────────────────────────────────
@@ -720,26 +713,90 @@ function printMissed(){
   window.print();
 }
 
-// ─── SPEECH ───────────────────────────────────────────────────────────────────
+// ─── NTNU AUDIO MAP (reverse-engineered via headless Chrome) ──────────────────
+// Base: https://www.hf.ntnu.no/now/audio/voc/{file}.mp3
+// Naming: verbs → aa_{word}, nouns → {article}_{word}, special chars → aa/oe/ae/paa
+const BASE = 'https://www.hf.ntnu.no/now/audio/voc/';
+const NTNU = {
+  'antropologi':'en_antropologi','arkitektur':'en_arkitektur','avis':'ei_avis',
+  'Barcelona':'Barcelona','bare':'bare','bensinstasjon':'en_bensinstasjon',
+  'bil':'en_bil','bli':'aa_bli','bo':'aa_bo','bra':'bra','brus':'en_brus',
+  'by':'en_by','båt':'en_baat','dag':'en_dag','dame':'ei_dame','de':'de',
+  'deg':'deg','den':'den','der':'der','dere':'dere','det':'det','du':'du',
+  'ei':'ei','ekspeditør':'en_ekspeditoer','en':'en','engelsk':'engelsk',
+  'er':'er','et':'ett','familie':'en_familie','flink':'flink','fly':'et_fly',
+  'fra':'fra','gammel':'gammel','gift':'gift','gjøre':'aa_gjoere','god':'god',
+  'ha':'aa_ha','hallo':'hallo','han':'han','her':'her','hete':'aa_hete',
+  'hilse':'aa_hilse','hun':'hun','hva':'hva','hvor':'hvor','hvordan':'hvordan',
+  'hyggelig':'hyggelig','i':'i','ikke':'ikke','Italia':'Italia',
+  'italiensk':'italiensk','ja':'ja','jeg':'jeg','jente':'ei_jente',
+  'jobbe':'aa_jobbe','kanskje':'kanskje','kart':'et_kart',
+  'kilometer':'en_kilometer','komme':'aa_komme','koste':'aa_koste',
+  'krone':'ei_krone','langt':'langt','ledig':'ledig','litt':'litt','med':'med',
+  'men':'men','morgen':'en_morgen','møte':'aa_moete','nei':'nei','neste':'neste',
+  'Norge':'Norge','norsk':'norsk','nå':'naa','og':'og','også':'ogsaa',
+  'over':'over','professor':'en_professor','på':'paa','reise':'aa_reise',
+  'Roma':'Roma','sammen':'sammen','seinere':'seinere','seks':'seks',
+  'ses':'aa_ses','snakke':'aa_snakke','snart':'snart','Spania':'Spania',
+  'spansk':'spansk','stoppe':'aa_stoppe','student':'en_student',
+  'studere':'aa_studere','så':'saa','ta':'aa_ta','takk':'takk','til':'til',
+  'tilbake':'tilbake','tog':'et_tog','Trondheim':'Trondheim','tur':'en_tur',
+  'turist':'en_turist','tusen':'tusen','tysk':'tysk','Tyskland':'Tyskland',
+  'unnskyld':'unnskyld','velkommen':'velkommen','vi':'vi','være':'aa_vaere',
+  'å':'aa','år':'et_aar',
+  // phrases with dedicated recordings
+  'Ha det bra!':'ha_det_bra','Det går bra!':'det_gaar_bra',
+  'Vær så god!':'vaer_saa_god','Hyggelig å hilse på deg!':'hyggelig_aa_hilse_paa_deg',
+  'vær så god':'vaer_saa_god',
+  // number words
+  'én / ei / ett':'en','to':'to_tall','tre':'tre_tall',
+};
+
+let currentAudio = null;
+function ntnu(text){
+  // strip "sju / syv" → "sju", clean up
+  const t = text.replace(/\s*\/.*$/,'').replace(/…/g,'').trim();
+  const file = NTNU[t];
+  return file ? BASE + file + '.mp3' : null;
+}
+
+function playAudio(text, btnEl){
+  const url = ntnu(text);
+  if(currentAudio){ currentAudio.pause(); currentAudio = null; }
+  if(btnEl) btnEl.classList.add('on');
+  const done = () => { if(btnEl) btnEl.classList.remove('on'); };
+
+  if(url){
+    const a = new Audio(url);
+    currentAudio = a;
+    a.onended = done;
+    a.onerror = () => { fallbackSpeak(text, done); };
+    a.play().catch(() => fallbackSpeak(text, done));
+  } else {
+    fallbackSpeak(text, done);
+  }
+}
+
+// ─── SPEECH FALLBACK (Web Speech API) ─────────────────────────────────────────
 let voices=[];
 function loadVoices(){voices=window.speechSynthesis.getVoices();}
 loadVoices();
 if(speechSynthesis.onvoiceschanged!==undefined) speechSynthesis.onvoiceschanged=loadVoices;
 
-function doSpeak(){
+function fallbackSpeak(text, onDone){
   if(!window.speechSynthesis) return;
-  const w=deck[idx];
-  if(!w) return;
-  const text=w.no.replace(/\s*\/.*$/,'').replace(/…/g,'');
   speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(text);
+  const u=new SpeechSynthesisUtterance(text.replace(/\s*\/.*$/,''));
   const norVoice=voices.find(v=>v.lang.startsWith('nb')||v.lang.startsWith('nn')||v.lang==='no');
   if(norVoice){u.voice=norVoice;u.lang=norVoice.lang;}else{u.lang='nb-NO';}
   u.rate=0.8; u.pitch=1;
-  const btn=document.getElementById('speakBtn');
-  btn.classList.add('on');
-  u.onend=()=>btn.classList.remove('on');
+  u.onend=onDone;
   speechSynthesis.speak(u);
+}
+
+function doSpeak(){
+  const w=deck[idx]; if(!w) return;
+  playAudio(w.no, document.getElementById('speakBtn'));
 }
 
 // ─── KEYBOARD ─────────────────────────────────────────────────────────────────
