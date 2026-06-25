@@ -110,6 +110,29 @@ main{flex:1;padding:14px 14px 28px;display:flex;flex-direction:column;align-item
 .ipa-legend td{padding:3px 6px;border-bottom:1px solid var(--border)}
 .ipa-legend td:first-child{font-family:'SF Mono','Courier New',monospace;font-weight:700;color:var(--text);width:60px}
 .ipa-legend td:nth-child(2){color:var(--muted)}
+/* TEXT MODE */
+.text-screen{width:100%;max-width:560px}
+.dialogue-card{background:#fff;border-radius:16px;box-shadow:var(--shadow);margin-bottom:12px;overflow:hidden}
+.dialogue-hdr{background:var(--blue);color:#fff;padding:10px 16px;display:flex;align-items:center;justify-content:space-between}
+.dialogue-hdr-title{font-size:.85rem;font-weight:700}
+.dialogue-play{background:rgba(255,255,255,.2);border:none;color:#fff;border-radius:12px;padding:5px 12px;font-size:.8rem;font-weight:700;cursor:pointer}
+.dialogue-body{padding:14px 16px;display:flex;flex-direction:column;gap:10px}
+.line{display:flex;gap:10px;align-items:flex-start}
+.line-who{font-size:.72rem;font-weight:800;color:var(--blue);min-width:22px;padding-top:2px;text-transform:uppercase}
+.line-text{font-size:.97rem;line-height:1.6;flex:1;flex-wrap:wrap}
+.line-en{font-size:.8rem;color:var(--muted);font-style:italic;margin-top:2px}
+.w{cursor:pointer;border-radius:4px;padding:1px 2px;transition:background .1s;display:inline}
+.w:active,.w.known{background:#dbeafe}.w.learning{background:#fef3c7}.w.new-w{background:#fee2e2}
+/* POPUP */
+.popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:1000;backdrop-filter:blur(2px)}
+.popup{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;background:#fff;border-radius:22px 22px 0 0;padding:20px 20px 32px;z-index:1001;box-shadow:0 -4px 30px rgba(0,0,0,.2)}
+.popup-no{font-size:1.9rem;font-weight:800;color:var(--text)}
+.popup-ipa{font-family:'SF Mono','Courier New',monospace;font-size:.88rem;color:var(--muted);margin-top:2px}
+.popup-en{font-size:1.2rem;font-weight:700;color:var(--blue);margin-top:8px}
+.popup-ty{font-size:.75rem;color:var(--muted);background:var(--bg);display:inline-block;padding:2px 9px;border-radius:10px;margin-top:4px}
+.popup-etym{background:var(--amber);border-left:3px solid var(--amber-b);border-radius:0 8px 8px 0;padding:8px 12px;font-size:.78rem;color:var(--amber-t);line-height:1.5;margin-top:10px}
+.popup-speak{margin-top:14px;display:flex;align-items:center;gap:7px;padding:10px 22px;border-radius:20px;border:2px solid var(--blue);background:transparent;color:var(--blue);font-size:.9rem;font-weight:700;cursor:pointer}
+.popup-speak:active{background:var(--blue);color:#fff}
 .hidden{display:none!important}
 @keyframes fadeUp{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}
 .fade-in{animation:fadeUp .2s ease}
@@ -155,6 +178,7 @@ main{flex:1;padding:14px 14px 28px;display:flex;flex-direction:column;align-item
     <button class="mbtn active" id="btnLearn"    onclick="setMode('learn')">📖 Learn</button>
     <button class="mbtn"        id="btnPractice" onclick="setMode('practice')">🎯 Practice</button>
     <button class="mbtn"        id="btnList"     onclick="setMode('list')">📋 List</button>
+    <button class="mbtn"        id="btnText"     onclick="setMode('text')">💬 Text</button>
   </div>
   <button class="etym-toggle" id="etymToggle" onclick="toggleEtym()">🔗 Origins on</button>
   <div class="sess-info" id="sessInfo"></div>
@@ -227,6 +251,20 @@ main{flex:1;padding:14px 14px 28px;display:flex;flex-direction:column;align-item
 
   <!-- List view -->
   <div class="list-screen hidden" id="listScreen"></div>
+
+  <!-- Text view -->
+  <div class="text-screen hidden" id="textScreen"></div>
+
+  <!-- Word popup -->
+  <div class="popup hidden" id="popup">
+    <div class="popup-no" id="popNo"></div>
+    <div class="popup-ipa" id="popIpa"></div>
+    <div class="popup-en" id="popEn"></div>
+    <div class="popup-ty" id="popTy"></div>
+    <div class="popup-etym hidden" id="popEtym"></div>
+    <button class="popup-speak" onclick="popupSpeak()">🔊 Hør uttalen</button>
+  </div>
+  <div class="popup-overlay hidden" id="popOverlay" onclick="closePopup()"></div>
 
   <!-- Session done -->
   <div class="done-card hidden" id="doneCard">
@@ -522,6 +560,126 @@ function applyEtym(){
     (showEtym && deck[idx]?.etym) ? '' : 'none';
 }
 
+// ─── DIALOGUES ────────────────────────────────────────────────────────────────
+const DIALOGUES = {
+  k:{ title:'1K · Ken — Fra Oslo med tog', audio:'audio/dialogue/1ken.mp3',
+    lines:[
+      {who:'M',no:'Jeg heter Monika. Hva heter du?',en:'My name is Monika. What is your name?'},
+      {who:'K',no:'Jeg heter Ken.',en:'My name is Ken.'},
+      {who:'M',no:'Hvor kommer du fra?',en:'Where do you come from?'},
+      {who:'K',no:'Jeg kommer fra England. Og du?',en:'I come from England. And you?'},
+      {who:'M',no:'Jeg kommer fra Oslo, men jeg bor i Trondheim.',en:'I come from Oslo, but I live in Trondheim.'},
+      {who:'K',no:'Har du familie i Trondheim?',en:'Do you have family in Trondheim?'},
+      {who:'M',no:'Ja, jeg er gift, og jeg har ei jente.',en:'Yes, I am married, and I have a daughter.'},
+      {who:'K',no:'Hva heter hun?',en:'What is her name?'},
+      {who:'M',no:'Hun heter Emma. Hun er seks år.',en:'Her name is Emma. She is six years old.'},
+    ]},
+  a:{ title:'1A · Anna — Fra Roma med fly', audio:'audio/dialogue/1anna.mp3',
+    lines:[
+      {who:'A',no:'Unnskyld, er du norsk?',en:'Excuse me, are you Norwegian?'},
+      {who:'N',no:'Ja, jeg kommer fra Trondheim. Hva gjør du i Norge?',en:'Yes, I come from Trondheim. What do you do in Norway?'},
+      {who:'A',no:'Jeg er student. Jeg studerer på NTNU. Og du?',en:'I am a student. I study at NTNU. And you?'},
+      {who:'N',no:'Jeg jobber på NTNU.',en:'I work at NTNU.'},
+      {who:'A',no:'Hva jobber du med?',en:'What do you work with?'},
+      {who:'N',no:'Jeg er professor i antropologi. Hva studerer du?',en:'I am a professor of anthropology. What do you study?'},
+      {who:'A',no:'Jeg studerer arkitektur.',en:'I study architecture.'},
+      {who:'N',no:'Snakker du norsk?',en:'Do you speak Norwegian?'},
+      {who:'A',no:'Ja, jeg snakker italiensk, engelsk og litt norsk.',en:'Yes, I speak Italian, English and a little Norwegian.'},
+    ]},
+  m:{ title:'1M · Maria — Fra Bergen med båt', audio:'audio/dialogue/1maria.mp3',
+    lines:[
+      {who:'M',no:'Unnskyld, snakker du norsk?',en:'Excuse me, do you speak Norwegian?'},
+      {who:'P',no:'Ja, litt.',en:'Yes, a little.'},
+      {who:'M',no:'Er det ledig her?',en:'Is this seat vacant?'},
+      {who:'P',no:'Ja, vær så god!',en:'Yes, please sit down!'},
+      {who:'M',no:'Takk. Hvor er vi nå?',en:'Thank you. Where are we now?'},
+      {who:'P',no:'Vi kommer snart til Ålesund.',en:'We will soon arrive at Ålesund.'},
+      {who:'M',no:'Hvor kommer du fra?',en:'Where do you come from?'},
+      {who:'P',no:'Jeg kommer fra Spania. Jeg er turist.',en:'I come from Spain. I am a tourist.'},
+      {who:'M',no:'Hyggelig å hilse på deg!',en:'Nice to meet you!'},
+      {who:'P',no:'I like måte! Ha det bra!',en:'Likewise! Goodbye!'},
+      {who:'M',no:'Ha det! Vi ses seinere.',en:'Bye! See you later.'},
+    ]},
+  p:{ title:'1P · Peter — Fra Hamburg med bil', audio:'audio/dialogue/1peter.mp3',
+    lines:[
+      {who:'E',no:'God dag! Kan jeg hjelpe dere?',en:'Good day! Can I help you?'},
+      {who:'P',no:'Ja takk. Unnskyld, hvor langt er det til Trondheim?',en:'Yes please. Excuse me, how far is it to Trondheim?'},
+      {who:'E',no:'Det er omtrent 500 kilometer.',en:'It is about 500 kilometres.'},
+      {who:'P',no:'Vi kommer fra Tyskland. Er dere norske?',en:'We come from Germany. Are you Norwegian?'},
+      {who:'E',no:'Ja. Er dere turister?',en:'Yes. Are you tourists?'},
+      {who:'P',no:'Nei, vi er studenter.',en:'No, we are students.'},
+      {who:'E',no:'Hva koster en brus?',en:'How much does a soda cost?'},
+      {who:'P',no:'Jeg tar også en brus og ei avis.',en:'I will also have a soda and a newspaper.'},
+      {who:'E',no:'Velkommen til Norge!',en:'Welcome to Norway!'},
+    ]},
+};
+
+// Build vocabulary lookup by Norwegian word
+const WORD_LOOKUP = {};
+Object.values(V).flat().forEach(w=>{
+  const key = w.no.toLowerCase().replace(/[!?.]/g,'');
+  WORD_LOOKUP[key] = w;
+  // also index without article variants
+  WORD_LOOKUP[w.no.toLowerCase()] = w;
+});
+
+let popupWord = null;
+
+function renderTextMode(){
+  const dialogs = {k:DIALOGUES.k, a:DIALOGUES.a, m:DIALOGUES.m, p:DIALOGUES.p};
+  const toShow = unit==='all' ? Object.values(dialogs) :
+                 DIALOGUES[unit] ? [DIALOGUES[unit]] : Object.values(dialogs);
+  document.getElementById('textScreen').innerHTML = toShow.map(d=>`
+    <div class="dialogue-card">
+      <div class="dialogue-hdr">
+        <div class="dialogue-hdr-title">${d.title}</div>
+        <button class="dialogue-play" onclick="playAudio('${d.audio}',this);this.textContent='⏹ Stop'">▶ Hør teksten</button>
+      </div>
+      <div class="dialogue-body">
+        ${d.lines.map(l=>`
+          <div>
+            <div class="line">
+              <div class="line-who">${l.who}</div>
+              <div class="line-text">${tokenize(l.no)}</div>
+            </div>
+            <div class="line" style="padding-left:32px">
+              <div class="line-en">${l.en}</div>
+            </div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function tokenize(sentence){
+  // Split into words+punctuation, wrap known vocab in clickable spans
+  return sentence.split(/(\s+|(?=[,!?.]))/g).map(tok=>{
+    if(!tok || /^\s+$/.test(tok)) return tok||' ';
+    const clean = tok.toLowerCase().replace(/[!?.,]/g,'');
+    const w = WORD_LOOKUP[clean];
+    const st = w ? cardState(w) : null;
+    const cls = st==='known'?'known':st==='learning'?'learning':w?'new-w':'';
+    if(w) return `<span class="w ${cls}" onclick="showPopup('${tok.replace(/'/g,"\\'")}','${clean}')">${tok}</span>`;
+    return `<span>${tok}</span>`;
+  }).join('');
+}
+
+function showPopup(display, key){
+  const w = WORD_LOOKUP[key];
+  if(!w) return;
+  popupWord = w;
+  document.getElementById('popNo').textContent  = w.no;
+  document.getElementById('popIpa').textContent = getIpa(w.no.replace(/\s*\/.*$/,'').trim());
+  document.getElementById('popEn').textContent  = w.en;
+  document.getElementById('popTy').textContent  = w.type;
+  const etymEl = document.getElementById('popEtym');
+  if(showEtym && w.etym){ etymEl.textContent=w.etym; etymEl.classList.remove('hidden'); }
+  else { etymEl.classList.add('hidden'); }
+  show('popup',true); show('popOverlay',true);
+  setTimeout(()=>popupSpeak(),200);
+}
+function closePopup(){ show('popup',false); show('popOverlay',false); popupWord=null; }
+function popupSpeak(){ if(popupWord) playAudio(popupWord.no, document.getElementById('popup').querySelector('.popup-speak')); }
+
 // ─── BOOT ─────────────────────────────────────────────────────────────────────
 srs=loadSRS();
 applyEtym();
@@ -539,7 +697,7 @@ function setUnit(u){
 }
 function setMode(m){
   mode=m;
-  ['Learn','Practice','List'].forEach(k=>document.getElementById('btn'+k).classList.toggle('active',k.toLowerCase()===m));
+  ['Learn','Practice','List','Text'].forEach(k=>document.getElementById('btn'+k).classList.toggle('active',k.toLowerCase()===m));
   buildDeck(); renderUI();
 }
 function buildDeck(){
@@ -559,11 +717,14 @@ function buildDeck(){
 function show(id,v){document.getElementById(id).classList.toggle('hidden',!v);}
 function renderUI(){
   const isList=mode==='list';
-  const hasCards=!isList&&deck.length>0;
-  show('listScreen',isList);show('ipaLegend',isList);
-  show('cardWrap',hasCards);show('progRow',hasCards);show('progTrack',hasCards);show('statsRow',hasCards);
-  show('doneCard',false);show('ratingArea',false);show('learnNext',false);
+  const isText=mode==='text';
+  const hasCards=!isList&&!isText&&deck.length>0;
+  show('listScreen',isList); show('ipaLegend',isList);
+  show('textScreen',isText);
+  show('cardWrap',hasCards); show('progRow',hasCards); show('progTrack',hasCards); show('statsRow',hasCards);
+  show('doneCard',false); show('ratingArea',false); show('learnNext',false);
   if(isList){renderList();return;}
+  if(isText){renderTextMode();return;}
   if(hasCards){renderCard();}
   else if(mode==='practice'){showDone();}
   updateStats();
@@ -716,8 +877,12 @@ function printMissed(){
 // ─── NTNU AUDIO MAP (reverse-engineered via headless Chrome) ──────────────────
 // Base: https://www.hf.ntnu.no/now/audio/voc/{file}.mp3
 // Naming: verbs → aa_{word}, nouns → {article}_{word}, special chars → aa/oe/ae/paa
-const BASE = 'https://www.hf.ntnu.no/now/audio/voc/';
-const NTNU = {
+// Local audio (downloaded from NTNU), fallback to remote, then Web Speech
+const VOC_LOCAL  = 'audio/voc/';
+const VOC_REMOTE = 'https://www.hf.ntnu.no/now/audio/voc/';
+const NUM_LOCAL  = 'audio/numerals/';
+
+const NTNU_FILES = {
   'antropologi':'en_antropologi','arkitektur':'en_arkitektur','avis':'ei_avis',
   'Barcelona':'Barcelona','bare':'bare','bensinstasjon':'en_bensinstasjon',
   'bil':'en_bil','bli':'aa_bli','bo':'aa_bo','bra':'bra','brus':'en_brus',
@@ -744,24 +909,36 @@ const NTNU = {
   'turist':'en_turist','tusen':'tusen','tysk':'tysk','Tyskland':'Tyskland',
   'unnskyld':'unnskyld','velkommen':'velkommen','vi':'vi','være':'aa_vaere',
   'å':'aa','år':'et_aar',
-  // phrases with dedicated recordings
   'Ha det bra!':'ha_det_bra','Det går bra!':'det_gaar_bra',
   'Vær så god!':'vaer_saa_god','Hyggelig å hilse på deg!':'hyggelig_aa_hilse_paa_deg',
   'vær så god':'vaer_saa_god',
-  // number words
-  'én / ei / ett':'en','to':'to_tall','tre':'tre_tall',
+};
+
+// Number words → numeral audio files (0-30, 40,50...100,1000)
+const NUM_AUDIO = {
+  'null':0,'én / ei / ett':1,'to':2,'tre':3,'fire':4,'fem':5,'seks':6,
+  'sju / syv':7,'åtte':8,'ni':9,'ti':10,'elleve':11,'tolv':12,
+  'tretten':13,'fjorten':14,'femten':15,'seksten':16,'sytten':17,
+  'atten':18,'nitten':19,'tjue':20,'tretti':30,'førti':40,
+  'femti':50,'seksti':60,'sytti':70,'åtti':80,'nitti':90,'hundre':100,'tusen':1000,
 };
 
 let currentAudio = null;
-function ntnu(text){
-  // strip "sju / syv" → "sju", clean up
-  const t = text.replace(/\s*\/.*$/,'').replace(/…/g,'').trim();
-  const file = NTNU[t];
-  return file ? BASE + file + '.mp3' : null;
+
+function getAudioUrl(text){
+  const t = text.replace(/…/g,'').trim();
+  const key = t.replace(/\s*\/.*$/,'').trim();
+  // number audio
+  if(NUM_AUDIO[t]!==undefined) return NUM_LOCAL + NUM_AUDIO[t] + '.mp3';
+  if(NUM_AUDIO[key]!==undefined) return NUM_LOCAL + NUM_AUDIO[key] + '.mp3';
+  // vocab audio
+  const file = NTNU_FILES[t] || NTNU_FILES[key];
+  return file ? VOC_LOCAL + file + '.mp3' : null;
 }
 
 function playAudio(text, btnEl){
-  const url = ntnu(text);
+  // allow passing a direct file path (e.g. dialogue files)
+  const url = (text.endsWith('.mp3') && text.includes('/')) ? text : getAudioUrl(text);
   if(currentAudio){ currentAudio.pause(); currentAudio = null; }
   if(btnEl) btnEl.classList.add('on');
   const done = () => { if(btnEl) btnEl.classList.remove('on'); };
@@ -770,7 +947,18 @@ function playAudio(text, btnEl){
     const a = new Audio(url);
     currentAudio = a;
     a.onended = done;
-    a.onerror = () => { fallbackSpeak(text, done); };
+    a.onerror = () => {
+      // fallback: try remote NTNU if local fails
+      const key = text.replace(/\s*\/.*$/,'').replace(/…/g,'').trim();
+      const file = NTNU_FILES[key];
+      if(file && url.startsWith('audio/')){
+        const remote = new Audio(VOC_REMOTE + file + '.mp3');
+        currentAudio = remote;
+        remote.onended = done;
+        remote.onerror = () => fallbackSpeak(text, done);
+        remote.play().catch(() => fallbackSpeak(text, done));
+      } else { fallbackSpeak(text, done); }
+    };
     a.play().catch(() => fallbackSpeak(text, done));
   } else {
     fallbackSpeak(text, done);
