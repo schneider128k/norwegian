@@ -938,30 +938,38 @@ function getAudioUrl(text){
 
 function playAudio(text, btnEl){
   // allow passing a direct file path (e.g. dialogue files)
-  const url = (text.endsWith('.mp3') && text.includes('/')) ? text : getAudioUrl(text);
+  const isDirect = text.endsWith('.mp3') && text.includes('/');
+  const url = isDirect ? text : getAudioUrl(text);
+  const isPhrase = !isDirect && !url; // no NTNU recording exists
+
   if(currentAudio){ currentAudio.pause(); currentAudio = null; }
+  speechSynthesis.cancel();
   if(btnEl) btnEl.classList.add('on');
   const done = () => { if(btnEl) btnEl.classList.remove('on'); };
+
+  // For phrases with no dedicated NTNU recording: stay silent (no bad TTS)
+  if(isPhrase){ done(); return; }
 
   if(url){
     const a = new Audio(url);
     currentAudio = a;
     a.onended = done;
     a.onerror = () => {
-      // fallback: try remote NTNU if local fails
+      // Local file missing → try remote NTNU directly (no TTS fallback for words)
       const key = text.replace(/\s*\/.*$/,'').replace(/…/g,'').trim();
       const file = NTNU_FILES[key];
       if(file && url.startsWith('audio/')){
         const remote = new Audio(VOC_REMOTE + file + '.mp3');
         currentAudio = remote;
         remote.onended = done;
-        remote.onerror = () => fallbackSpeak(text, done);
-        remote.play().catch(() => fallbackSpeak(text, done));
-      } else { fallbackSpeak(text, done); }
+        remote.onerror = done; // give up silently rather than play bad TTS
+        remote.play().catch(done);
+      } else { done(); }
     };
-    a.play().catch(() => fallbackSpeak(text, done));
-  } else {
-    fallbackSpeak(text, done);
+    // Do NOT use .catch() → fallbackSpeak: that's what caused double audio.
+    // The play() promise rejection (e.g. autoplay policy) is non-fatal;
+    // actual load failure is caught by onerror above.
+    a.play().catch(done);
   }
 }
 
